@@ -1,4 +1,12 @@
 /*
+ * @Copyright: 
+ * @file name: File name
+ * @Data: Do not edit
+ * @LastEditor: 
+ * @LastData: 
+ * @Describe: 
+ */
+/*
  * OB_GINS: An Optimization-Based GNSS/INS Integrated Navigation System
  *
  * Copyright (C) 2022 i2Nav Group, Wuhan University
@@ -44,7 +52,8 @@ public:
         preintegration_->imuErrorEvaluate(parameters, residuals);
 
         if (jacobians) {
-            if (jacobians[0]) {
+            if (jacobians[0]) 
+            {
                 preintegration_->imuErrorJacobian(jacobians[0]);
             }
         }

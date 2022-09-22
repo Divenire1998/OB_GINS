@@ -46,7 +46,7 @@ void PreintegrationBase::integration(const IMU &imu_pre, const IMU &imu_cur) {
 
     // 连续状态积分, 先位置速度再姿态
 
-    // 位置速度
+    // 位置速度变
     Vector3d dvfb = imu_cur.dvel + 0.5 * imu_cur.dtheta.cross(imu_cur.dvel) +
                     1.0 / 12.0 * (imu_pre.dtheta.cross(imu_cur.dvel) + imu_pre.dvel.cross(imu_cur.dtheta));
     Vector3d dvel = current_state_.q.toRotationMatrix() * dvfb + gravity_ * dt;
@@ -54,7 +54,7 @@ void PreintegrationBase::integration(const IMU &imu_pre, const IMU &imu_cur) {
     current_state_.p += dt * current_state_.v + 0.5 * dt * dvel;
     current_state_.v += dvel;
 
-    // 姿态
+    // 姿态 旋转矢量
     Vector3d dtheta = imu_cur.dtheta + 1.0 / 12.0 * imu_pre.dtheta.cross(imu_cur.dtheta);
     current_state_.q *= Rotation::rotvec2quaternion(dtheta);
     current_state_.q.normalize();

@@ -13,6 +13,9 @@ endif ()
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS on)
+
+
 file(GLOB_RECURSE SOURCE
         src/ob_gins.cc
         src/fileio/fileloader.cc

@@ -92,6 +92,7 @@ Eigen::MatrixXd PreintegrationEarthOdo::evaluate(const IntegrationState &state0,
     residual.block<3, 1>(6, 0)  = 2 * (qb0b1_ * corrected_q_).vec();
     residual.block<3, 1>(9, 0)  = state1.bg - state0.bg;
     residual.block<3, 1>(12, 0) = state1.ba - state0.ba;
+
     residual.block<3, 1>(15, 0) = cnb0 * (state1.p - state0.p) - corrected_s_;
     residual(18)                = state1.sodo - state0.sodo;
 
@@ -246,9 +247,10 @@ void PreintegrationEarthOdo::integrationProcess(unsigned long index) {
 
     // 连续状态积分, 先位置速度再姿态
 
-    // 位置速度
+    // 比力引起的速度增量，考虑旋转和划桨补偿
     Vector3d dvfb = imu_cur.dvel + 0.5 * imu_cur.dtheta.cross(imu_cur.dvel) +
                     1.0 / 12.0 * (imu_pre.dtheta.cross(imu_cur.dvel) + imu_pre.dvel.cross(imu_cur.dtheta));
+
     // 哥氏项和重力项
     Vector3d dv_cor_g = (gravity_ - 2.0 * iewn_.cross(current_state_.v)) * dt;
 
@@ -272,8 +274,8 @@ void PreintegrationEarthOdo::integrationProcess(unsigned long index) {
     current_state_.q = qnn * current_state_.q * Rotation::rotvec2quaternion(dtheta);
     current_state_.q.normalize();
 
-    // 预积分
-
+    // ========================================== 预积分 ===================================================
+    
     // 中间时刻的地球自转等效旋转矢量
     dnn           = -(delta_time_ - 0.5 * dt) * iewn_;
     Matrix3d cbbe = (q0_.inverse() * Rotation::rotvec2quaternion(dnn) * q0_ * delta_state_.q).toRotationMatrix();

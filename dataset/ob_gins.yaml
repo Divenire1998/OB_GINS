@@ -33,6 +33,7 @@ initab: [ 0, 0, 0 ]  # 初始加表零偏 (accelerometer biases), mGal
 # IMU文件数据列数 (7-imu only, 8-with odometer)
 # IMU data file columns
 imudatalen: 8
+
 # IMU原始数据频率, Hz
 # IMU data rate
 imudatarate: 200
@@ -47,9 +48,9 @@ antlever: [ -0.073, 0.302, 0.087 ]  # 天线杆臂 (antenna lever), IMU前右下
 odolever: [ -0.64, -0.628, 2.122 ]  # 里程计杆臂 (odometer lever), IMU前右下方向, m
 bodyangle: [ 0, -0.30, -1.09 ]       # IMU到载体的旋转角 (mouting angles to construct C_b^v), deg
 
+
 odometer:
     isuseodo: true              # use odometer
-
     std: [ 0.05, 0.05, 0.05 ]   # 里程标准差 (vehicle velocity standard deviation), m/s
     srw: 100                    # 比例因子误差 (odometer scale-factor standard deviation), PPM
 

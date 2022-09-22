@@ -31,7 +31,9 @@
 class MarginalizationFactor : public ceres::CostFunction {
 
 public:
+
     MarginalizationFactor() = delete;
+
     explicit MarginalizationFactor(std::shared_ptr<MarginalizationInfo> marg_info)
         : marg_info_(std::move(marg_info)) {
 

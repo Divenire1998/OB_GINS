@@ -1,4 +1,12 @@
 /*
+ * @Copyright: 
+ * @file name: File name
+ * @Data: Do not edit
+ * @LastEditor: 
+ * @LastData: 
+ * @Describe: 
+ */
+/*
  * OB_GINS: An Optimization-Based GNSS/INS Integrated Navigation System
  *
  * Copyright (C) 2022 i2Nav Group, Wuhan University
@@ -45,10 +53,13 @@ public:
         Vector3d p{parameters[0][0], parameters[0][1], parameters[0][2]};
         Quaterniond q{parameters[0][6], parameters[0][3], parameters[0][4], parameters[0][5]};
 
+        // 把一串数据映射到矩阵或者向量中
         Eigen::Map<Eigen::Matrix<double, 3, 1>> error(residuals);
 
-        error = p + q.toRotationMatrix() * lever_ - gnss_.blh;
+        // IMU系下的误差
+        error = p -(gnss_.blh -  q.toRotationMatrix() * lever_);
 
+        // 信息矩阵开根号
         Matrix3d weight = Matrix3d::Zero();
         weight(0, 0)    = 1.0 / gnss_.std[0];
         weight(1, 1)    = 1.0 / gnss_.std[1];

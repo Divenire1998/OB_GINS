@@ -171,7 +171,8 @@ public:
         return dr;
     }
 
-    static Vector3d local2global(const Vector3d &origin, const Vector3d &local) {
+    static Vector3d local2global(const Vector3d &origin, const Vector3d &local) 
+    {
 
         Vector3d ecef0 = blh2ecef(origin);
         Matrix3d cn0e  = cne(origin);
@@ -182,12 +183,18 @@ public:
         return blh1;
     }
 
-    static Vector3d global2local(const Vector3d &origin, const Vector3d &global) {
+    static Vector3d global2local(const Vector3d &origin, const Vector3d &global) 
+    {
+        // 原点 LLA 转 ECEF
         Vector3d ecef0 = blh2ecef(origin);
+
+        // 原点导航系相对于ECEF系的旋转矩阵
         Matrix3d cn0e  = cne(origin);
 
+        // 导航GPS位置 LLA 转 ECEF
         Vector3d ecef1 = blh2ecef(global);
 
+        // 输出当地导航系下得位置运动量
         return cn0e.transpose() * (ecef1 - ecef0);
     }
 

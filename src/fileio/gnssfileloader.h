@@ -35,20 +35,24 @@ public:
         open(filename, columns, FileLoader::TEXT);
     }
 
-    const GNSS &next() {
+    const GNSS &next() 
+    {
         data_ = load();
 
         gnss_.time = data_[0];
+
+        // 经纬高
         memcpy(gnss_.blh.data(), &data_[1], 3 * sizeof(double));
+        gnss_.blh[0] *= D2R;
+        gnss_.blh[1] *= D2R;
 
         // 13列GNSS文件包含GNSS速度
+        // 标准差
         if (data_.size() == 7) {
             memcpy(gnss_.std.data(), &data_[4], 3 * sizeof(double));
         } else {
             memcpy(gnss_.std.data(), &data_[7], 3 * sizeof(double));
         }
-        gnss_.blh[0] *= D2R;
-        gnss_.blh[1] *= D2R;
 
         return gnss_;
     }

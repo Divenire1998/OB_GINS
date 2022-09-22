@@ -213,6 +213,7 @@ void PreintegrationOdo::integrationProcess(unsigned long index) {
     delta_state_.s += delta_state_.q.toRotationMatrix() *
                       (cvb_ * dsodo * (1 + delta_state_.sodo) -
                        Rotation::rotvec2quaternion(imu_cur.dtheta).toRotationMatrix() * lodo_ + lodo_);
+                       
     integration(imu_pre, imu_cur);
 
     // 更新系统状态雅克比和协方差矩阵

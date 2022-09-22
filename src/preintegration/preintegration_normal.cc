@@ -35,13 +35,15 @@ PreintegrationNormal::PreintegrationNormal(std::shared_ptr<IntegrationParameters
     setNoiseMatrix();
 }
 
+// 计算和给定相邻帧状态量的残差
+// 在后端优化的IMU Factor中被调用
 Eigen::MatrixXd PreintegrationNormal::evaluate(const IntegrationState &state0, const IntegrationState &state1,
                                                double *residuals) {
-    sqrt_information_ =
-        Eigen::LLT<Eigen::Matrix<double, NUM_STATE, NUM_STATE>>(covariance_.inverse()).matrixL().transpose();
 
+    //  15维
     Eigen::Map<Eigen::Matrix<double, NUM_STATE, 1>> residual(residuals);
 
+    // 预积分量相对于误差状态量的雅克比
     Matrix3d dp_dbg = jacobian_.block<3, 3>(0, 9);
     Matrix3d dp_dba = jacobian_.block<3, 3>(0, 12);
     Matrix3d dv_dbg = jacobian_.block<3, 3>(3, 9);
@@ -52,7 +54,7 @@ Eigen::MatrixXd PreintegrationNormal::evaluate(const IntegrationState &state0, c
     Vector3d dbg = state0.bg - delta_state_.bg;
     Vector3d dba = state0.ba - delta_state_.ba;
 
-    // 积分校正
+    // 一阶雅克比近似积分校正
     corrected_p_ = delta_state_.p + dp_dba * dba + dp_dbg * dbg;
     corrected_v_ = delta_state_.v + dv_dba * dba + dv_dbg * dbg;
     corrected_q_ = delta_state_.q * Rotation::rotvec2quaternion(dq_dbg * dbg);
@@ -66,6 +68,13 @@ Eigen::MatrixXd PreintegrationNormal::evaluate(const IntegrationState &state0, c
     residual.block<3, 1>(9, 0)  = state1.bg - state0.bg;
     residual.block<3, 1>(12, 0) = state1.ba - state0.ba;
 
+    // LLT分解，residual 还需乘以信息矩阵的sqrt_info
+    // 因为优化函数其实是d=r^T P^-1 r ，P表示协方差，而ceres只接受最小二乘优化
+    // 因此需要把P^-1做LLT分解，使d=(L^T r)^T (L^T r) = r'^T r
+
+    // 因为ceres没有g2o设置信息矩阵的接口，因此置信度直接乘在残差上，这里通过LLT分解，相当于将信息矩阵开根号
+    sqrt_information_ =
+        Eigen::LLT<Eigen::Matrix<double, NUM_STATE, NUM_STATE>>(covariance_.inverse()).matrixL().transpose();
     residual = sqrt_information_ * residual;
     return residual;
 }

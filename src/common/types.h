@@ -34,8 +34,8 @@ typedef struct GNSS {
 
     Vector3d blh;
     Vector3d std;
-} GNSS;
 
+} GNSS;
 typedef struct IMU {
     double time;
     double dt;

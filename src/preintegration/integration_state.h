@@ -1,4 +1,12 @@
 /*
+ * @Copyright: 
+ * @file name: File name
+ * @Data: Do not edit
+ * @LastEditor: 
+ * @LastData: 
+ * @Describe: 
+ */
+/*
  * OB_GINS: An Optimization-Based GNSS/INS Integrated Navigation System
  *
  * Copyright (C) 2022 i2Nav Group, Wuhan University
@@ -35,17 +43,23 @@ using std::vector;
 typedef struct IntegrationState {
     double time;
 
+    // pvq
     Vector3d p{0, 0, 0};
     Quaterniond q{0, 0, 0, 0};
     Vector3d v{0, 0, 0};
 
+    // imu bias
     Vector3d bg{0, 0, 0};
     Vector3d ba{0, 0, 0};
 
+    // scale
     Vector3d s{0, 0, 0};
+
+    // 轮速比例因子和安装角误差
     double sodo{0};
     Vector2d abv{0, 0};
 
+    // 没用上
     Vector3d sg{0, 0, 0};
     Vector3d sa{0, 0, 0};
 } IntegrationState;
