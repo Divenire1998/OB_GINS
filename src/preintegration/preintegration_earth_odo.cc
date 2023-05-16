@@ -28,7 +28,7 @@ PreintegrationEarthOdo::PreintegrationEarthOdo(std::shared_ptr<IntegrationParame
     : PreintegrationBase(std::move(parameters), imu0, std::move(state)) {
 
     // Reset state
-    resetState(state, NUM_STATE);
+    resetState(current_state_, NUM_STATE);
 
     // Set initial noise matrix
     setNoiseMatrix();
@@ -106,15 +106,9 @@ Eigen::MatrixXd PreintegrationEarthOdo::residualJacobianPose0(const IntegrationS
     Eigen::Map<Eigen::Matrix<double, NUM_STATE, NUM_POSE, Eigen::RowMajor>> jaco(jacobian);
     jaco.setZero();
 
-    // 地球自转的位置补偿项
-    double dt = 0;
-    for (const auto &pn : pn_) {
-        dt += pn.first;
-    }
-
     Matrix3d cnb0 = state0.q.inverse().toRotationMatrix();
 
-    jaco.block(0, 0, 3, 3) = -cnb0 - 2.0 * cnb0 * iewn_skew_ * dt;
+    jaco.block(0, 0, 3, 3) = -cnb0 - 2.0 * cnb0 * iewn_skew_ * delta_time_;
     jaco.block(0, 3, 3, 3) = Rotation::skewSymmetric(cnb0 * dpn_);
     jaco.block(3, 0, 3, 3) = -2.0 * cnb0 * iewn_skew_;
     jaco.block(3, 3, 3, 3) = Rotation::skewSymmetric(cnb0 * dvn_);
@@ -136,7 +130,7 @@ Eigen::MatrixXd PreintegrationEarthOdo::residualJacobianPose1(const IntegrationS
 
     jaco.block(0, 0, 3, 3)  = cnb0;
     jaco.block(3, 0, 3, 3)  = 2.0 * cnb0 * iewn_skew_;
-    jaco.block(6, 3, 3, 3)  = -Rotation::quaternionleft(qb0b1_ * corrected_q_).bottomRightCorner<3, 3>();
+    jaco.block(6, 3, 3, 3)  = -Rotation::quaternionright(qb0b1_ * corrected_q_).bottomRightCorner<3, 3>();
     jaco.block(15, 0, 3, 3) = cnb0;
 
     jaco = sqrt_information_ * jaco;
