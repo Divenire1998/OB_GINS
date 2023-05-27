@@ -1,19 +1,19 @@
 cmake_minimum_required(VERSION 3.10)
 project(ob_gins)
 
-set(CMAKE_CXX_STANDARD 14)
-
-if (CMAKE_BUILD_TYPE MATCHES "Debug")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-else ()
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS on)
+# 默认使用Release模式
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
 endif ()
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS on)
+project(ic_gvins)
+
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 
 file(GLOB_RECURSE SOURCE

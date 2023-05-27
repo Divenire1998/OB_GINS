@@ -35,8 +35,7 @@ public:
         open(filename, columns, FileLoader::TEXT);
     }
 
-    const GNSS &next() 
-    {
+    const GNSS &next() {
         data_ = load();
 
         gnss_.time = data_[0];

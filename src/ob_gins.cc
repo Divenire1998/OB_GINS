@@ -60,7 +60,6 @@ int main(int argc, char *argv[]) {
 
     auto ts = absl::Now();
 
-
     // 读取配置
     // load configuration
     YAML::Node config;
@@ -74,9 +73,9 @@ int main(int argc, char *argv[]) {
 
     // 时间信息
     // processing time
-    int windows   = config["windows"].as<int>();            // 滑动窗口大小
-    int starttime = config["starttime"].as<int>();          // 开始时间 Week Seconds
-    int endtime   = config["endtime"].as<int>();            // 结束时间 Week Seconds
+    int windows   = config["windows"].as<int>();   // 滑动窗口大小
+    int starttime = config["starttime"].as<int>(); // 开始时间 Week Seconds
+    int endtime   = config["endtime"].as<int>();   // 结束时间 Week Seconds
 
     // 迭代次数
     // number of iterations
@@ -156,10 +155,10 @@ int main(int argc, char *argv[]) {
 
     // GNSS仿真中断配置
     // GNSS outage parameters
-    bool isuseoutage = config["isuseoutage"].as<bool>(); // 是否开启GNSS仿真中断配置
-    int outagetime   = config["outagetime"].as<int>();   // 开启outage
-    int outagelen    = config["outagelen"].as<int>();    // 中断长度
-    int outageperiod = config["outageperiod"].as<int>(); // 中断时常
+    bool isuseoutage = config["isuseoutage"].as<bool>();       // 是否开启GNSS仿真中断配置
+    int outagetime   = config["outagetime"].as<int>();         // 开启outage
+    int outagelen    = config["outagelen"].as<int>();          // 中断长度
+    int outageperiod = config["outageperiod"].as<int>();       // 中断时常
 
     auto gnssthreshold = config["gnssthreshold"].as<double>(); // gnss抗差
 
@@ -233,12 +232,10 @@ int main(int argc, char *argv[]) {
     // 下一个积分节点 默认是1s后
     sow += INTEGRATION_LENGTH;
 
-    while (true) 
-    {
+    while (true) {
 
         // 文件中没有数据或者超出时间范围了
-        if ((imu_cur.time > endtime) || imufile.isEof()) 
-        {
+        if ((imu_cur.time > endtime) || imufile.isEof()) {
             break;
         }
 
@@ -249,8 +246,7 @@ int main(int argc, char *argv[]) {
         imu_pre = imu_cur;
         imu_cur = imufile.next();
 
-        if (imu_cur.time > sow) 
-        {
+        if (imu_cur.time > sow) {
             // 当前IMU数据时间等于GNSS数据时间, 读取新的GNSS
             // add GNSS and read new GNSS
             if (fabs(gnss.time - sow) < MINIMUM_INTERVAL) {
@@ -324,8 +320,7 @@ int main(int argc, char *argv[]) {
 
                 // 参数块 Node
                 // add parameter blocks
-                for (size_t k = 0; k <= preintegrationlist.size(); k++) 
-                {
+                for (size_t k = 0; k <= preintegrationlist.size(); k++) {
                     // 位姿
                     ceres::LocalParameterization *parameterization = new (PoseParameterization);
                     problem.AddParameterBlock(statedatalist[k].pose, Preintegration::numPoseParameter(),
@@ -341,14 +336,12 @@ int main(int argc, char *argv[]) {
 
                 ceres::LossFunction *loss_function = new ceres::HuberLoss(1.0);
                 std::vector<std::pair<double, ceres::ResidualBlockId>> gnss_residualblock_id;
-                for (const auto &gnss : gnsslist) 
-                {
+                for (const auto &gnss : gnsslist) {
                     // 取出队列中的GNSS因子
                     auto factor = new GnssFactor(gnss, antlever);
 
                     // 找到对应的位置
-                    for (size_t i = index; i <= preintegrationlist.size(); ++i) 
-                    {
+                    for (size_t i = index; i <= preintegrationlist.size(); ++i) {
                         if (fabs(gnss.time - timelist[i]) < MINIMUM_INTERVAL) {
                             auto id = problem.AddResidualBlock(factor, loss_function, statedatalist[i].pose);
                             gnss_residualblock_id.push_back(std::make_pair(gnss.time, id));
@@ -360,8 +353,7 @@ int main(int argc, char *argv[]) {
 
                 // 预积分残差
                 // preintegration factors
-                for (size_t k = 0; k < preintegrationlist.size(); k++) 
-                {
+                for (size_t k = 0; k < preintegrationlist.size(); k++) {
                     auto factor = new PreintegrationFactor(preintegrationlist[k]);
                     problem.AddResidualBlock(factor, nullptr, statedatalist[k].pose, statedatalist[k].mix,
                                              statedatalist[k + 1].pose, statedatalist[k + 1].mix);
@@ -388,8 +380,7 @@ int main(int argc, char *argv[]) {
 
                 // TODO: Just a example, you need remodify.
                 // Do GNSS outlier culling using chi-square test
-                if (is_outlier_culling && !gnss_residualblock_id.empty()) 
-                {
+                if (is_outlier_culling && !gnss_residualblock_id.empty()) {
                     // 3 degrees of freedom, 0.05
                     double chi2_threshold = 7.815;
 
@@ -631,7 +622,6 @@ int isNeedInterpolation(const IMU &imu0, const IMU &imu1, double mid) {
         // close to the first epoch
         if (dt < 0.0001) {
             return -1;
-
         }
 
         // 后一个历元接近
